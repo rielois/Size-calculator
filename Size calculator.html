@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nigerian Fit Project – Size Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 30px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-top: 5px solid #D297FF;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #2c3e4e;
+        }
+        .sub {
+            color: #5d6f7f;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        label {
+            display: block;
+            margin: 12px 0 4px;
+            font-weight: 600;
+            color: #2c3e4e;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        button {
+            background: #D297FF;
+            color: #2c3e4e;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 40px;
+            margin: 20px 0 15px;
+            width: 100%;
+            cursor: pointer;
+        }
+        .result {
+            background: #f9f0ff;
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border-left: 4px solid #D297FF;
+            display: none;
+        }
+        .result p {
+            margin: 8px 0;
+        }
+        .note {
+            font-size: 12px;
+            color: #6c7a89;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>📍 Nigerian Fit Project</h1>
+    <div class="sub">by Riel Empire – find your size in seconds</div>
+
+    <label>Bust (inches)</label>
+    <input type="number" id="bust" step="0.1" placeholder="e.g., 34">
+
+    <label>Waist (inches)</label>
+    <input type="number" id="waist" step="0.1" placeholder="e.g., 28">
+
+    <label>Hip (inches)</label>
+    <input type="number" id="hip" step="0.1" placeholder="e.g., 40">
+
+    <label>Height (cm) – optional, for length advice</label>
+    <input type="number" id="height" step="0.5" placeholder="e.g., 168">
+
+    <button onclick="calculateSize()">Find my size</button>
+
+    <div id="result" class="result"></div>
+    <div class="note">Based on real Nigerian women’s data. If bust and hip give different sizes, we recommend the larger size (hip) for dresses, then adjust top.</div>
+</div>
+
+<script>
+    function getBustSize(bust, waist, hip) {
+        if (bust >= 30.0 && bust <= 31.9) return "XXS";
+        if (bust >= 32.0 && bust <= 33.9) return "XS";
+        if (bust >= 34.0 && bust <= 35.9) return "S";
+        if (bust >= 36.0 && bust <= 37.9) return "SM";
+        if (bust >= 38.0 && bust <= 39.9) {
+            // M vs LM based on waist and hip
+            if (waist >= 33 && hip >= 43) return "LM (12 big)";
+            else return "M (12)";
+        }
+        if (bust >= 40.0 && bust <= 41.9) return "L";
+        if (bust >= 42.0 && bust <= 43.9) return "XL";
+        if (bust >= 44.0 && bust <= 46.9) return "1X";
+        if (bust >= 47.0 && bust <= 49.9) return "2X";
+        if (bust >= 50.0 && bust <= 52.9) return "3X";
+        return "outside range";
+    }
+
+    function getHipSize(hip) {
+        if (hip >= 34.0 && hip <= 34.9) return "XXS";
+        if (hip >= 35.0 && hip <= 35.9) return "XS";
+        if (hip >= 36.0 && hip <= 36.9) return "S";
+        if (hip >= 37.0 && hip <= 38.9) return "SM";
+        if (hip >= 39.0 && hip <= 40.9) return "M";
+        if (hip >= 41.0 && hip <= 42.9) return "LM";
+        if (hip >= 43.0 && hip <= 44.9) return "L";
+        if (hip >= 45.0 && hip <= 46.9) return "XL";
+        if (hip >= 48.0 && hip <= 50.9) return "1X";
+        if (hip >= 51.0 && hip <= 52.9) return "2X";
+        if (hip >= 53.0 && hip <= 55.9) return "3X";
+        return "outside range";
+    }
+
+    function calculateSize() {
+        // Get values
+        let bust = parseFloat(document.getElementById('bust').value);
+        let waist = parseFloat(document.getElementById('waist').value);
+        let hip = parseFloat(document.getElementById('hip').value);
+        let height = parseFloat(document.getElementById('height').value);
+
+        // Validation
+        if (isNaN(bust) || isNaN(waist) || isNaN(hip)) {
+            alert("Please enter bust, waist and hip in inches.");
+            return;
+        }
+
+        let bustSize = getBustSize(bust, waist, hip);
+        let hipSize = getHipSize(hip);
+        let finalSize = "";
+        let specialNote = "";
+
+        // Compare bustSize and hipSize for recommendation
+        const order = ["XXS","XS","S","SM","M","LM","L","XL","1X","2X","3X"];
+        // Normalise size names for comparison (remove " (12 big)" etc)
+        let bustNorm = bustSize.replace(" (12 big)","").replace(" (12)","");
+        let hipNorm = hipSize;
+        let bustIndex = order.indexOf(bustNorm);
+        let hipIndex = order.indexOf(hipNorm);
+        
+        if (bustIndex === -1) bustIndex = 0;
+        if (hipIndex === -1) hipIndex = 0;
+
+        if (bustNorm === hipNorm) {
+            finalSize = bustSize;
+        } else if (hipIndex > bustIndex) {
+            finalSize = hipSize;
+            specialNote = "📌 Your hips are larger than your bust. For dresses & skirts, choose size " + hipSize + " (we’ll adjust the top). For separate tops, use " + bustSize + ".";
+        } else {
+            finalSize = bustSize;
+            specialNote = "📌 Your bust is larger than your hips. For tops & fitted dresses, choose " + bustSize + ". For trousers, you may prefer " + hipSize + ".";
+        }
+
+        let heightAdvice = "";
+        if (!isNaN(height) && height > 0) {
+            let dressLength = Math.round(height * 0.6);
+            heightAdvice = `📏 Based on height ${height}cm, your dress length (shoulder to hem) is approx ${dressLength}cm.`;
+        }
+
+        // Display result
+        let resultDiv = document.getElementById('result');
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = `
+            <p><strong>✨ Your recommended size:</strong> ${finalSize}</p>
+            ${specialNote ? `<p>${specialNote}</p>` : ''}
+            ${heightAdvice ? `<p>${heightAdvice}</p>` : ''}
+            <p><small>🔍 Bust‑primary: ${bustSize} &nbsp;|&nbsp; Hip‑primary: ${hipSize}</small></p>
+        `;
+    }
+</script>
+</body>
+</html>
